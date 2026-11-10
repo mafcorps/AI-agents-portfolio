@@ -1,4 +1,4 @@
-# Agent 02 — ContentPulse
+# Agent 02 — Content Pulse
 ### Infinite Ideas Manager
 
 **Turning business information and social media trends into 30 days of actionable content.**

@@ -1,0 +1,270 @@
+{
+  "name": "Agent 2 - AIcontente pulse",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "ContentPulse — Infinite Ideas Manager",
+        "formDescription": "Tell us about your business, brand or project. ContentPulse will analyse your niche, identify content opportunities and generate a personalized 30-day social media content calendar with ready-to-use ideas, scripts and captions for TikTok and Instagram.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Business Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Website URL"
+            },
+            {
+              "fieldLabel": "Industry/Niche",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Business Description ",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Product/Services",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target audience",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Social Media Platforms",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Tik Tok"
+                  },
+                  {
+                    "option": "Instagram "
+                  },
+                  {
+                    "option": "Instagram + Tik Tok"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Brand Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Casual"
+                  },
+                  {
+                    "option": "Educational"
+                  },
+                  {
+                    "option": "Humorous"
+                  },
+                  {
+                    "option": "Luxury"
+                  },
+                  {
+                    "option": "Inspirational"
+                  },
+                  {
+                    "option": "Custom"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Main Marketing Objective ",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Brand Awareness"
+                  },
+                  {
+                    "option": "Engagement"
+                  },
+                  {
+                    "option": "Lead Generation"
+                  },
+                  {
+                    "option": "Sales"
+                  },
+                  {
+                    "option": "Community Growth"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Additional information",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b6f64c33-c8ba-48cf-a61c-a7d788304047",
+      "name": "On form submission",
+      "webhookId": "3a470336-12f9-47fe-ad9e-c5fcb0e5e137"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=\n{{ JSON.stringify({\n  api_key: \"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\",\n  query: \"Research current TikTok and Instagram trends, viral formats, hashtags, competitor strategies and content opportunities for this business. Business: \" + ($json[\"Business Name\"] || \"\") + \". Industry: \" + ($json[\"Industry/Niche\"] || \"\") + \". Description: \" + ($json[\"Business Description\"] || \"\") + \".\",\n  search_depth: \"advanced\",\n  max_results: 10,\n  include_answer: true\n}) }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8d494dd3-3b2c-440b-a053-a631d9fba1b1",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\n={{ `You are ContentPulse, a professional AI social media strategist and trend researcher.\n\nYour mission is to create a complete, research-based 30-day social media content strategy for ANY business, in ANY industry.\n\nCLIENT INFORMATION\nBusiness: ${$('On form submission').first().json['Business Name'] ?? ''}\nWebsite: ${$('On form submission').first().json['Website URL'] ?? ''}\nIndustry: ${$('On form submission').first().json['Industry/Niche'] ?? ''}\nBusiness Description: ${$('On form submission').first().json['Business Description'] ?? ''}\n\nLIVE TREND RESEARCH\nResearch query: ${$json.query ?? ''}\nResearch findings: ${$json.answer ?? ''}\n\nINSTRUCTIONS\n\n1. BUSINESS ANALYSIS\nAnalyse the business, target audience, positioning, products/services and competitors.\n\n2. TREND RESEARCH\nUse the supplied research findings to identify relevant TikTok and Instagram trends, content formats, hashtags and opportunities.\nPrioritise current trends. Never present old trends as current.\nDistinguish verified findings from creative recommendations.\nNever invent statistics, viral sounds or sources.\n\n3. CONTENT STRATEGY\nDefine 4-6 content pillars tailored to this specific business.\n\n4. 30-DAY EDITORIAL CALENDAR\nGenerate EXACTLY 30 different daily content ideas.\nDo not skip days or replace days with summaries.\nFor EVERY day include:\n\n- Day number\n- Platform: TikTok or Instagram Reels\n- Content format\n- Content title\n- Objective\n- Opening hook (first 3 seconds)\n- Complete video script with scenes and dialogue\n- Caption ready to publish\n- Relevant hashtags\n- Call to action\n- Production instructions\n- Strategic explanation\n\nMake every idea specific to the client's actual business.\nDo not use placeholders such as [Product Name] or [Athlete].\nAvoid repetitive ideas.\nUse a balanced combination of educational, entertaining, promotional, storytelling, community and trend-based content.\n\n5. EXECUTION STRATEGY\nProvide recommended posting frequency, production workflow and weekly performance KPIs.\n\n6. FINAL RECOMMENDATIONS\nExplain the three biggest opportunities for this business.\n\nOUTPUT RULES\n- Write in professional, clear English.\n- Use structured Markdown headings and tables where appropriate.\n- Be detailed and practical.\n- Deliver all 30 days in full.\n- Never invent live trend data.\n- If research is insufficient, clearly state the limitation.\n- Prioritise actionable content that a real marketing team can produce.\n\nYour final response must be a complete professional social media strategy, ready for execution.` }}\n\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": " You are ContentPulse, an advanced AI social media strategist.  You are responsible for transforming business information and trend research into actionable social media strategies.  Your objectives: 1. Understand each business, regardless of its industry. 2. Analyse its target audience and positioning. 3. Identify relevant TikTok and Instagram trends. 4. Generate original and engaging content ideas. 5. Create a complete 30-day editorial calendar. 6. Write ready-to-use scripts, captions and hooks.  For every content idea, provide: - Day and platform - Content format - Title and creative concept - Opening hook - Complete script - Caption - Hashtags - Call to action - Production instructions  Strategic rules: - Never restrict yourself to one industry or niche. - Adapt every recommendation to the specific business. - Avoid generic ideas and repetitive content. - Balance educational, entertaining, promotional and storytelling content. - Prioritise audience engagement, organic growth and conversions. - Use trend research as inspiration, not as a reason to copy competitors.  Your output must be detailed, professional, practical and ready to execute.  Always respond in the language most appropriate for the business."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        0
+      ],
+      "id": "c4b3c199-d11d-4434-bb2f-148e0b010cf3",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        208
+      ],
+      "id": "a98784c5-2b0d-4987-bc65-7f45e7887e1d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Your ContentPulse Strategy Is Ready! 🚀",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        752,
+        0
+      ],
+      "id": "4e8f252e-66c3-4120-81f7-1fcdb8ba5ac4",
+      "name": "Form",
+      "webhookId": "78f78791-6830-4e02-ba00-033016bf74fc"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "555e02be-9659-4273-9521-8ad7ee798afb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "rzU3HC14oU2ddnVe",
+  "tags": []
+}

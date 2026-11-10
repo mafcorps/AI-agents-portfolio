@@ -1,0 +1,205 @@
+{
+  "name": "Agent 01 - AI Ad Copywriter",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Ad Copywriter — Campaign Brief",
+        "formDescription": "Tell us about your business and advertising goals. Our AI Copywriter will analyze your offer, understand your target audience and generate 10 conversion-focused advertising variations for your campaigns.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Business Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Website URL",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Product/Service",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target audience",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Main Advertising Objective ",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Advertising Platform",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Meta ads"
+                  },
+                  {
+                    "option": "Google Ads"
+                  },
+                  {
+                    "option": "Both (Meta + Google)"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Additional Information",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        240,
+        0
+      ],
+      "id": "442f1645-94c8-4a4f-a1d4-70fc4a8c8334",
+      "name": "On form submission",
+      "webhookId": "772b1d90-8e03-4014-b2d0-6f1ab46688bd"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"api_key\": \"REPLACE_WITH_TAVILY_API_KEY\",\n  \"query\": \"Research {{$('On form submission').first().json['Business Name']}} {{$('On form submission').first().json['Product/Service']}}, its benefits, target audience and competitors.\",\n  \"search_depth\": \"basic\",\n  \"max_results\": 5,\n  \"include_answer\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        464,
+        0
+      ],
+      "id": "fc44d985-e94e-40c6-a2ff-9cc25a06815c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=RESEARCH RESULTS:\n\n{{ JSON.stringify($('HTTP Request').first().json.results) }}\n\nUse these research results to understand the market,\ncompetitors, product benefits and target audience.\nDo not invent facts.\nYOUR MAIN TASK:\n\nYou are not a research summarizer. You are a professional advertising copywriter.\n\nUsing:\n1. The business information submitted through the form.\n2. The Tavily research results.\n3. The target audience and advertising objectives.\n\nCreate exactly 10 ready-to-use advertising variations.\n\n**PART 1 — META ADS (5 variations)**\n\nFor each variation provide:\n- Campaign angle\n- Headline\n- Primary text\n- Description\n- Call to action\n- Target audience\n- Creative concept (visual suggestion)\n\n**PART 2 — GOOGLE ADS (5 variations)**\n\nFor each variation provide:\n- Campaign angle\n- 3 Headlines\n- 2 Descriptions\n- Call to action\n- Suggested keywords\n\nIMPORTANT RULES:\n- Make every variation different.\n- Adapt the messaging to the target audience.\n- Focus on conversion and the campaign objective.\n- Use research insights to create relevant messaging.\n- Never invent product features, statistics or company claims.\n- Avoid generic advertising language.\n- Write persuasive, professional advertising copy.\n- Make the output easy to read and copy.\n\nStart directly with the advertising campaign. Do not provide another research summary.\n\nEnd with a short section containing 3 strategic recommendations for the campaign.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        672,
+        0
+      ],
+      "id": "d2945631-816a-4a93-98ad-3156fd36cace",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        208
+      ],
+      "id": "c8fdd2d9-0003-4458-af1c-7a5cf3bd88d1",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "showText",
+        "responseText": "=<h1>Your AI Advertising Campaign Is Ready!</h1>\n<p>Your personalized advertising campaign has been generated.</p>\n<hr>\n<div style=\"white-space: pre-wrap;\">{{ $json.text }}</div>"
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "21d3d5a2-0479-4abe-a5e4-14cacf354275",
+      "name": "Form",
+      "webhookId": "075e776c-1421-458d-91c7-2adb797bb5f3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fd5485ea-6e8f-48f2-bfd3-d9176034df6c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "1lcTKPfWIE6Q1QT9",
+  "tags": []
+}

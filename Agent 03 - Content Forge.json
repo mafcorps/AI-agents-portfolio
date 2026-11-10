@@ -1,0 +1,370 @@
+{
+  "name": "Agent 03 - Content Forge",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "ContentForge — Content Repurposing Engine",
+        "formDescription": "Transform any blog article into an engaging X thread, a professional LinkedIn carousel, and a persuasive sales email.\n\nSimply provide the article URL or paste the full article content, add your brand details, and let ContentForge do the rest.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Brand/Business Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Article Title"
+            },
+            {
+              "fieldLabel": "Article URL"
+            },
+            {
+              "fieldLabel": "Full Blog Article/Content",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Target Audience",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Product/Service"
+            },
+            {
+              "fieldLabel": "Brand Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Friendly"
+                  },
+                  {
+                    "option": "Educational"
+                  },
+                  {
+                    "option": "Persuasive"
+                  },
+                  {
+                    "option": "Bold & Creative"
+                  },
+                  {
+                    "option": "Informal "
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Main CTA",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "852518eb-03ad-4800-b160-32ba7b306a8c",
+      "name": "On form submission",
+      "webhookId": "3f3098f6-8d13-45b0-bfde-33b01cb4d994"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7a113792-a685-4d69-ab4b-7d17a86c83bc",
+              "leftValue": "={{ $json[\"Article URL\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "287e5e67-4ff5-49b6-8164-7c80d8a488bc",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        128,
+        0
+      ],
+      "id": "3a2c8a40-ae3f-45be-bbce-97cca476c272",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $json[\"Article URL\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        304,
+        -64
+      ],
+      "id": "dc85d93d-3d3f-4a5c-853f-306ccddceadd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bceba26a-b674-4579-8d81-d6bc50dcafa1",
+              "name": "article_content",
+              "value": "={{ $json[\"Full Blog Article / Content\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        368,
+        64
+      ],
+      "id": "cadb41df-e14a-4b41-acc8-3b19dfcd2735",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "22a97e14-cea6-4aab-a03c-bd39317855c5",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nYou are ContentForge, an expert content strategist, copywriter and content repurposing specialist.\n\nYour job is to transform one source blog article into three high-quality marketing assets.\n\nBRAND INFORMATION\n\nBrand: {{ $json[\"Brand / Business Name\"] }}\nArticle title: {{ $json[\"Article Title\"] }}\nTarget audience: {{ $json[\"Target Audience\"] }}\nProduct or service: {{ $json[\"Product / Service\"] }}\nBrand tone: {{ $json[\"Brand Tone\"] }}\nMain CTA: {{ $json[\"Main CTA\"] }}\n\nSOURCE ARTICLE\n\n{{ $json.article_content }}\n\nYOUR TASK\n\nAnalyse the source article carefully. Identify its central message, strongest insights, useful facts, arguments and practical takeaways.\n\nCreate the following three deliverables.\n\n1. X / TWITTER THREAD\n\nCreate a complete thread of 8-12 posts.\n\nRequirements:\n- Start with a compelling hook.\n- Build a logical narrative.\n- Make each post valuable and engaging.\n- Keep posts concise and suitable for X.\n- Use curiosity and storytelling where appropriate.\n- Finish with a strong CTA.\n- Number every post.\n\n2. LINKEDIN CAROUSEL\n\nCreate a carousel with 8-10 slides.\n\nFor every slide provide:\n- Slide number.\n- Slide headline.\n- Main slide text.\n- Suggested visual direction.\n\nRequirements:\n- Slide 1 must have a strong hook.\n- Present one clear idea per slide.\n- Use concise, professional language.\n- Make the content educational and easy to understand.\n- End with a CTA slide.\n\n3. SALES EMAIL\n\nCreate one persuasive marketing email.\n\nInclude:\n- 3 alternative subject lines.\n- Preview text.\n- Opening hook.\n- Main email body.\n- Clear benefits for the target audience.\n- Natural transition to the product or service.\n- Strong CTA using the supplied CTA.\n- Professional sign-off.\n\nIMPORTANT RULES\n\nSTRICT SOURCE ACCURACY\n\n1. Treat the supplied article as the primary and authoritative source.\n2. Never invent statistics, percentages, research findings, quotations, dates, trends or factual claims.\n3. Only use statistics and research findings explicitly mentioned in the source article.\n4. If a statistic has no source in the article, do not include it.\n5. Do not introduce new trends, technologies or predictions as established facts.\n6. Clearly distinguish creative recommendations from facts extracted from the article.\n\nCTA COMPLIANCE\n\n1. Use the exact Main CTA supplied by the user.\n2. Do not replace it with another offer, download, product or action.\n3. Do not invent URLs, landing pages, promotions or resources.\n4. If no URL is supplied, use the CTA text without inventing a link.\n\nCONTENT ACCURACY\n\n1. Preserve the article's central message and original context.\n2. Do not assume the article is about the current year.\n3. Do not add unsupported references to 2026 or future trends.\n4. Adapt the writing style to each platform without changing the underlying facts.\n\nFORMATTING\n\n1. Use clean Markdown.\n2. Do not output HTML entities such as &#x20;.\n3. Format hyperlinks correctly.\n4. Keep headings, numbering and bullet points consistent.\n5. Make every deliverable ready to copy and publish.\n\n- Do not invent statistics, facts, quotations or claims.\n- Use the source article as the factual foundation.\n- You may reorganise and creatively adapt the content.\n- Do not simply copy and paste the article.\n- Adapt each deliverable to its platform.\n- Keep the brand tone consistent.\n- If the article does not mention the supplied product or service, do not invent product features.\n- Make the outputs detailed, complete and ready to use.\n\nOUTPUT FORMAT\n\nUse clear headings:\n\n# CONTENTFORGE REPORT\n\n## 1. X / TWITTER THREAD\n\n## 2. LINKEDIN CAROUSEL\n\n## 3. SALES EMAIL\n\n## 4. CONTENT STRATEGY NOTES\n\n\nFINAL QUALITY CONTROL\n\nBefore delivering the final report, perform an internal quality check.\n\nSOURCE VERIFICATION:\n- Verify every statistic, percentage, date, quotation and research claim against the supplied article.\n- Remove any claim that cannot be directly supported by the article.\n- Never attribute statistics to an organisation unless the article explicitly does so.\n- Do not claim that the outputs use only source-supported facts unless this has been verified.\n\nX THREAD:\n- Include a compelling opening hook.\n- Make the thread conversational and engaging.\n- End with a clear CTA that follows the user's supplied Main CTA.\n- Encourage discussion when appropriate.\n\nLINKEDIN CAROUSEL:\n- Keep each slide concise and visually usable.\n- Avoid overcrowded slides.\n- Ensure the final slide uses the supplied Main CTA.\n\nSALES EMAIL:\n- Write as a real marketing email, not as a summary of the article.\n- Focus on the recipient's problem, benefits and desired outcome.\n- Use persuasive but natural language.\n- Include the exact CTA supplied by the user.\n- Never invent offers, statistics, URLs or product features.\n\nOUTPUT CLEANLINESS:\n- Use standard Markdown only.\n- Never output HTML entities or escaped formatting characters.\n- Remove unnecessary repetition.\n- Ensure all three deliverables are complete and ready to use.\n\n\nAt the end, briefly explain the central message you prioritised and how the three formats approach it differently.\n",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        752,
+        0
+      ],
+      "id": "149a6421-d5d8-4bab-9908-6c7302769c79",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        160
+      ],
+      "id": "bc677d0c-38b0-4934-922c-61ac9cf2acc8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Your Content Is Ready!",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "c0901bb8-0c50-4cd1-9ea2-352d70d2b3b4",
+      "name": "Form",
+      "webhookId": "7f281240-4d9a-40d2-a654-c9bfb16fff77"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6784917f-1571-47cf-851b-7d7ecfd817d1",
+              "name": "article_content",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        432,
+        -64
+      ],
+      "id": "50539c9a-44e7-447a-bb8c-7db33badcd58",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "744c2cdc-b776-403d-b2f4-14f3bc86fda0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "zx73jTCyhQPA3huQ",
+  "tags": []
+}

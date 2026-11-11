@@ -1,0 +1,321 @@
+{
+  "name": "Agent 04 — Local SEO Optimizer",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "SEO Optimizer — Business Growth Assistant",
+        "formDescription": "Analyse your local business presence, generate strategic responses to customer reviews, and create a weekly Google Business Profile content plan to strengthen your local visibility.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Business Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Business Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Physical Store"
+                  },
+                  {
+                    "option": "Service-Area Business"
+                  },
+                  {
+                    "option": "Online Business"
+                  },
+                  {
+                    "option": "Hybrid Business"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Google Business Profile URL"
+            },
+            {
+              "fieldLabel": "Website URL"
+            },
+            {
+              "fieldLabel": "Business Location / Service Area"
+            },
+            {
+              "fieldLabel": "Business Category",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Main Products / Services",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target Audience",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Competitors",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Customer Reviews ",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Brand Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Friendly"
+                  },
+                  {
+                    "option": "Approachable "
+                  },
+                  {
+                    "option": "Premium"
+                  },
+                  {
+                    "option": "Casual"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Main Business Goal",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Increase Local Visibility "
+                  },
+                  {
+                    "option": "Generate More calls"
+                  },
+                  {
+                    "option": "Get More Customers"
+                  },
+                  {
+                    "option": "Improve Online Reputation "
+                  },
+                  {
+                    "option": "Increase Website Visits"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        160,
+        16
+      ],
+      "id": "5e4877ad-0bd2-4a31-ab97-1071b2b96a0c",
+      "name": "On form submission",
+      "webhookId": "b6d1598f-5ca5-48c0-a46e-003b82b460bb"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4cfa3ce5-2949-4db4-a4be-7e87192d1184",
+              "name": "business_name",
+              "value": "={{ $json[\"Business Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "ee7f2fd9-7bce-43e6-8d0a-9c541d67bec8",
+              "name": "business_type",
+              "value": "={{ $json[\"Business Type\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "5472eae7-02fc-4298-8789-0c5f5fdf2dc2",
+              "name": "location",
+              "value": "={{ $json[\"Business Location / Service Area\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "0f88461a-44cd-477e-b9b6-3ccb7c685777",
+              "name": "category",
+              "value": "={{ $json[\"Business Category\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "3f048f76-cfe3-44c2-8a00-61b1831692c5",
+              "name": "services",
+              "value": "={{ $json[\"Main Products / Services\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "39307aa0-2bbf-4e1d-9f53-e4ea75a1a884",
+              "name": "audience",
+              "value": "={{ $json[\"Target Audience\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "fe83f88e-d908-46cb-b957-d50570164860",
+              "name": "reviews",
+              "value": "={{ $json[\"Customer Reviews \"] }}",
+              "type": "string"
+            },
+            {
+              "id": "6e5ddd24-d145-45aa-94f7-db35e3bd5ded",
+              "name": "tone",
+              "value": "={{ $json[\"Brand Tone\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "f3c60251-cc8e-48d0-8205-1b37ee18ae99",
+              "name": "goal",
+              "value": "={{ $json[\"Main Business Goal\"] }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        320,
+        16
+      ],
+      "id": "014d2b75-f0e0-47aa-9a9d-b7c1adef5f1a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nYou are Local SEO Optimizer, an expert in Local SEO, Google Business Profile optimization, and online reputation management.\n\nBUSINESS INFORMATION:\nBusiness name: {{ $json.business_name }}\nBusiness type: {{ $json.business_type }}\nLocation / Service Area: {{ $json.location }}\nBusiness category: {{ $json.category }}\nProducts / Services: {{ $json.services }}\nTarget audience: {{ $json.audience }}\nCustomer reviews: {{ $json.reviews }}\nBrand tone: {{ $json.tone }}\nMain business goal: {{ $json.goal }}\n\nCreate a complete and practical LOCAL SEO OPTIMIZATION REPORT.\n\n1. LOCAL SEO AUDIT\nAnalyse the business information, identify strengths, weaknesses, missing information and opportunities. Recommend relevant Google Business Profile improvements.\n\n2. KEYWORD OPPORTUNITIES\nSuggest 10 relevant keywords and search phrases. Adapt them to the business location or target market. Do not assume a physical location for online businesses.\n\n3. CUSTOMER REVIEW ANALYSIS\nAnalyse the reviews provided. Identify positive themes, complaints and opportunities. Write 3 personalized responses: positive, negative and neutral.\nNever invent reviews or customer experiences. If no reviews are supplied, explain that actual review analysis requires review data.\n\n4. GOOGLE BUSINESS POSTS\nCreate 4 complete posts, one for each week. Include title, post text, CTA, keywords and suggested visual. Adapt the content to the business.\n\n5. ACTION PLAN\nCreate prioritized actions for:\n- First 7 days\n- First 30 days\n- Next 90 days\n\n6. PERFORMANCE KPIs\nRecommend 5 measurable KPIs and explain how to monitor them.\n\nIMPORTANT:\n- Be specific and actionable.\n- Never invent rankings, statistics, reviews or business facts.\n- Clearly distinguish supplied facts from recommendations.\n- If information is missing, state the limitation.\n- Adapt recommendations to online businesses as well as physical businesses.\n- Do not claim to have accessed the Google Business Profile unless actual profile data was supplied.\n\nOUTPUT:\n# LOCAL SEO OPTIMIZATION REPORT\n## 1. Local SEO Audit\n## 2. Keyword Opportunities\n## 3. Customer Review Analysis & Responses\n## 4. Four Weekly Google Business Posts\n## 5. 7 / 30 / 90-Day Action Plan\n## 6. Recommended KPIs\n## 7. Final Strategic Recommendations\n",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        464,
+        16
+      ],
+      "id": "36195d0b-6bd9-4b94-9a4a-5029cf4ff4a8",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        224
+      ],
+      "id": "88ad050d-2fda-47ae-95af-8ecaa6f324a5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Your Local SEO Report Is Ready!",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        704,
+        16
+      ],
+      "id": "927ad40e-a845-4a8a-95b7-0c88bcd27b8f",
+      "name": "Form",
+      "webhookId": "d92dcd7b-fe70-4a40-99bf-eb36180890b5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f74d86a1-4370-4982-be6b-959aeb8f953b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "jv4qqF9WsNiH4fVT",
+  "tags": []
+}

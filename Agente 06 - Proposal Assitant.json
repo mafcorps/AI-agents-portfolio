@@ -1,0 +1,319 @@
+{
+  "name": "Agente 06 - Proposal Assitant",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Proposal Assistant — Commercial Proposal Generator",
+        "formDescription": "Transform client briefings and emails into structured, professional commercial proposals in seconds.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client / Company Name"
+            },
+            {
+              "fieldLabel": "Client Briefing / Original Email",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Company Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Company Description",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Product / Service Offered",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Proposed Budget / Price"
+            },
+            {
+              "fieldLabel": "Expected Delivery Time"
+            },
+            {
+              "fieldLabel": "Additional Requirements",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Proposal Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional "
+                  },
+                  {
+                    "option": "Corporate"
+                  },
+                  {
+                    "option": "Persuasive "
+                  },
+                  {
+                    "option": "Consultant"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Currency",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "EUR (€)"
+                  },
+                  {
+                    "option": "USD ($)"
+                  },
+                  {
+                    "option": "GBP (£)"
+                  },
+                  {
+                    "option": "AED (د.إ)"
+                  },
+                  {
+                    "option": "Other / Not specified"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "44fd012a-787b-4cc7-ae74-244d6d1da9e0",
+      "name": "On form submission",
+      "webhookId": "79f82829-ae1f-4355-bf0b-15fb5c05d254"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca68c0b5-a79b-42da-8147-da3fd6e9e520",
+              "name": "client_name",
+              "value": "={{ $json[\"Client / Company Name\"] || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "4ae6c1b6-ad56-4084-9b6c-acaaab6c6367",
+              "name": "client_briefing",
+              "value": "={{ $json[\"Client Briefing / Original Email\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "2ddf5881-038a-4903-9fd3-fb583809c9c3",
+              "name": "company_name",
+              "value": "={{ $json[\"Your Company Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "1149bd79-b0e3-4c30-ace8-125507888394",
+              "name": "company_name",
+              "value": "={{ $json[\"Your Company Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "93eab9cc-e0b2-41ea-82dc-c54af9d182c7",
+              "name": "company_description",
+              "value": "={{ $json[\"Your Company Description\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "9ed1f7d9-eb7f-4619-a1c8-904927aac79f",
+              "name": "product_service",
+              "value": "={{ $json[\"Product / Service Offered\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "f4c50950-8271-464a-9324-df0a9ef82473",
+              "name": "budget",
+              "value": "={{ $json[\"Proposed Budget / Price\"] || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "6128355d-f62f-4781-9ad5-b0d898d3bc2f",
+              "name": "delivery_time",
+              "value": "={{ $json[\"Expected Delivery Time\"] || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "3036f261-839c-451e-8476-8a4fc9682694",
+              "name": "requirements",
+              "value": "{ $json[\"Additional Requirements\"] || \"None provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "3a70b549-7bb1-4734-9bf6-b1f5e18e90dd",
+              "name": "tone",
+              "value": "={{ $json[\"Proposal Tone\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "ec8207d1-c7da-4b6a-8b37-c31ff369d610",
+              "name": "currency",
+              "value": "={{ $json[\"Currency\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "8a3ce498-9949-4b81-99fe-d2da164c145b",
+              "name": "current_date",
+              "value": "={{ $now.toFormat('dd LLLL yyyy') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4b97a7e8-1682-427f-b884-5f8f77cccf71",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "\nGenerate a complete commercial proposal using the information provided in the system instructions. Follow the required structure, accuracy rules and selected tone. Make the proposal specific to the client's needs, commercially persuasive and ready for human review.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "= You are Proposal Assistant, an expert commercial proposal writer and B2B business consultant.  Your task is to transform client briefings, emails and business requirements into professional, persuasive and structured commercial proposals.  ## INPUT INFORMATION  Client / Company: {{ $('Edit Fields').item.json.client_name }} Original Briefing: {{ $('Edit Fields').item.json.client_briefing }} Your Company: {{ $('Edit Fields').item.json.company_name }} Company Description: {{ $('Edit Fields').item.json.company_description }} Product / Service: {{ $('Edit Fields').item.json.product_service }} Proposed Budget: {{ $('Edit Fields').item.json.budget }} Expected Delivery Time: {{ $('Edit Fields').item.json.delivery_time }} Additional Requirements: {{ $('Edit Fields').item.json.requirements }} Proposal Tone: {{ $('Edit Fields').item.json.tone }} Currency: {{ $('Edit Fields').item.json.currency }} Current Date: {{ $('Edit Fields').item.json.current_date }} ## REQUIRED PROPOSAL STRUCTURE  # COMMERCIAL PROPOSAL  Prepared for: Prepared by: Date:  ## 1. Executive Summary Summarize the client's needs and introduce the proposed solution.  ## 2. Understanding of Client Needs Identify the client's objectives, challenges and requirements using the original briefing.  ## 3. Proposed Solution Explain the proposed solution and how it addresses the client's actual needs.  ## 4. Scope of Work Describe the activities, responsibilities and boundaries of the project.  ## 5. Deliverables List the concrete outputs the client will receive.  ## 6. Timeline and Milestones Present the supplied delivery time and suggest milestones only when justified. Otherwise mark as To be confirmed.  ## 7. Commercial Investment Present the supplied budget and currency. If no budget is provided, write To be confirmed.  ## 8. Terms and Conditions Use only terms supplied by the user. Otherwise write Commercial terms to be agreed.  ## 9. Next Steps Explain what should happen to move the proposal forward.  ## 10. Information Requiring Confirmation List missing information and assumptions that need clarification.  ## ACCURACY RULES  - Never invent prices, discounts, costs or payment terms. - Never invent deadlines, guarantees or measurable results. - Never invent company credentials, case studies or testimonials. - Never promise services that the user's company does not offer. - Never assume missing information. - Use To be confirmed when details are unavailable. - Clearly distinguish confirmed facts from recommendations. - Do not leave generic placeholders such as [Insert text here]. - Use the same language as the client's briefing. - Follow the selected proposal tone. - Make the proposal specific, professional and commercially persuasive.  ## INTERNAL REVIEW — NOT PART OF THE CLIENT PROPOSAL  After the proposal, provide:  1. Overall proposal quality assessment. 2. Missing information. 3. Potential commercial risks. 4. Three questions to clarify with the client. 5. Recommendations before sending.  Keep this internal section separate from the actual proposal.\n\n## COMMERCIAL ACCURACY AND PROPOSAL CONTROL\n\n- Use the actual current date. Never generate an outdated or arbitrary date.\n- Distinguish between services explicitly confirmed by the user's company and additional services suggested by the AI.\n- Never present invented quantities, deliverables, campaign budgets, working hours or reporting frequencies as confirmed commitments.\n- When suggesting quantities or deliverables not specified by the user, label them clearly as \"Proposed scope — subject to confirmation\".\n- Never assume advertising spend is included in the agency fee.\n- If advertising budget is not specified, explicitly state that it is excluded or to be confirmed.\n- Distinguish project start date, project duration and final delivery date.\n- Never transform a client's desired start date into a confirmed commitment.\n- Do not guarantee business growth, customer acquisition, engagement or financial results.\n- Ensure the total commercial investment is clearly distinguished from optional costs and third-party expenses.\n- Before finalizing, check that every proposed deliverable is realistic and consistent with the supplied company description and service offering.\n\n## COMMERCIAL QUALITY CHECK\n\nThe proposal must be commercially usable, not simply persuasive.\n\nPrioritize:\n1. Clear scope boundaries.\n2. Transparent pricing.\n3. Realistic deliverables.\n4. Explicit assumptions.\n5. Clear client and provider responsibilities.\n6. No unauthorized commercial commitments.\n\n## DATE VALIDATION\n- Never use a hardcoded date or a date from training data.\n- Use the current execution date supplied by the workflow.\n- If the current date is unavailable, write \"Date: To be confirmed\".\n- Never guess the current date.\n"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": " Generate a complete commercial proposal using all the information provided in the System Message.  Follow the required proposal structure and accuracy rules.  Make the proposal specific to the client's needs, commercially persuasive and professionally written.  Ensure that the internal review is clearly separated from the client-facing proposal."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        368,
+        -16
+      ],
+      "id": "0091f593-a471-4947-8b5d-73f72ce9a37b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        192
+      ],
+      "id": "b273e8dd-40d0-40a8-82dc-d4beb0afa695",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Proposal Assistant — Proposal Generated",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        736,
+        -16
+      ],
+      "id": "bae3e2a5-e239-4579-ac98-9ea65c4362f0",
+      "name": "Form",
+      "webhookId": "2bc05a2f-1629-4011-8fb7-55cea5456d52"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7b0ad8da-8e30-4764-8110-de283b680f38",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "El6HD4teq9aOmQ1a",
+  "tags": []
+}

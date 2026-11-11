@@ -1,0 +1,300 @@
+{
+  "name": "Agent 05 — Lead Detective)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Lead Detective — Potential Client Research",
+        "formDescription": "Submit information about a potential client to uncover business challenges, identify sales opportunities and generate a highly personalized outreach message.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client's LinkedIn URL",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Contact's Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company Website"
+            },
+            {
+              "fieldLabel": "Your Product/Service",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Ideal Customer ",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Main Value Proposition",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Preferred Outreach Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Friendly "
+                  },
+                  {
+                    "option": "Direct"
+                  },
+                  {
+                    "option": "Consultative "
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Main Call to Action",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a7ce350b-28f1-4892-925d-7cfc7b420ba9",
+      "name": "On form submission",
+      "webhookId": "40fecd05-5e05-48c7-a070-8bf54b710ea2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c867338-558d-4624-bc99-bcb85b063956",
+              "name": "contact_name",
+              "value": "={{ $json[\"Contact's Full Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "74d08eec-0e26-4456-9cf3-b15e71730d01",
+              "name": "linkedin_url",
+              "value": "={{ $json[\"Client's LinkedIn URL\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "d2b4623d-971e-481e-9bb8-a610e269df9e",
+              "name": "company_name",
+              "value": "={{ $json[\"Company Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "b9b57b3b-a870-4955-8565-b92190a01452",
+              "name": "company_website",
+              "value": "={{ $json[\"Company Website\"] || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "b1a4074b-3ac7-40c9-b6a9-9b8978aaaa90",
+              "name": "product_service",
+              "value": "={{ $json[\"Your Product/Service\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "95bb28d3-b35e-4ee2-9e3e-0df15ec10188",
+              "name": "ideal_customer",
+              "value": "={{ $json[\"Your Ideal Customer \"] }}",
+              "type": "string"
+            },
+            {
+              "id": "33aa84ed-e372-4f7f-bf5a-0c9945431ef8",
+              "name": "value_proposition",
+              "value": "={{ $json[\"Your Main Value Proposition\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "7588856c-d323-4e4f-8a2f-dbab27c2fab3",
+              "name": "outreach_tone",
+              "value": "={{ $json[\"Preferred Outreach Tone\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "c307d1ab-ae95-4938-b917-68755176ea17",
+              "name": "call_to_action",
+              "value": "={{ $json[\"Main Call to Action\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        176,
+        0
+      ],
+      "id": "4573df7c-4b48-4bf9-8bd1-c4e653e0ce50",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"api_key\": \"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\",\n  \"query\": \"Research {{ $json.company_name }} and identify its business activities, products, services, target markets, recent developments, operational challenges, expansion plans and potential business needs. LinkedIn: {{ $json.linkedin_url }}. Website: {{ $json.company_website }}. Find public evidence of challenges relevant to {{ $json.product_service }}.\",\n  \"search_depth\": \"advanced\",\n  \"topic\": \"general\",\n  \"max_results\": 8,\n  \"include_answer\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        335.5,
+        0
+      ],
+      "id": "4f1e1107-13a5-49b9-a6d4-268e57569784",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are LEAD DETECTIVE, an advanced B2B sales intelligence analyst and lead generation specialist.\n\nYour mission is to investigate potential business clients, identify genuine business challenges, uncover commercial opportunities and create highly personalized sales outreach messages.\n\nYou must act as a combination of business researcher, sales strategist and professional copywriter.\n\n## 1. INPUT INFORMATION\n\n**Potential Contact:**\n- Name: {{ $json.contact_name }}\n- LinkedIn Profile: {{ $json.linkedin_url }}\n\n**Company:**\n- Company Name: {{ $json.company_name }}\n- Website: {{ $json.company_website }}\n\n**What the User Sells:**\n- Product / Service: {{ $json.product_service }}\n- Ideal Customer: {{ $json.ideal_customer }}\n- Main Value Proposition: {{ $json.value_proposition }}\n\n**Outreach Preferences:**\n- Preferred Tone: {{ $json.outreach_tone }}\n- Main Call to Action: {{ $json.call_to_action }}\n\n## 2. PUBLIC RESEARCH\n\nUse the following research results to investigate the company and identify relevant business information:\n\n{{ JSON.stringify($json) }}\n\nAnalyze the available research carefully. Look for:\n- Company activities and business model.\n- Products and services.\n- Target markets and customers.\n- Recent company developments.\n- Expansion plans and growth signals.\n- Hiring activity and organizational changes.\n- Operational inefficiencies.\n- Customer experience challenges.\n- Technology gaps and outdated processes.\n- Potential commercial opportunities.\n\nOnly use information supported by the available research.\n\n## 3. COMPANY INTELLIGENCE\n\nCreate a concise but informative company profile.\n\nInclude:\n- What the company does.\n- Its industry and business model.\n- Main products or services.\n- Target customers.\n- Relevant recent developments.\n- Any important business signals discovered.\n\nClearly distinguish verified information from reasonable interpretations.\n\n## 4. PAIN POINT DETECTION\n\nIdentify up to THREE potential business challenges.\n\nFor each identified challenge, provide:\n\n**Pain Point:**\nDescribe the specific potential problem.\n\n**Supporting Evidence:**\nExplain which public information supports this observation.\n\n**Business Impact:**\nExplain why this problem could matter to the company.\n\n**Confidence Level:**\nClassify the finding as HIGH, MEDIUM or LOW.\n\n**Commercial Relevance:**\nExplain how the product or service supplied by the user could potentially address this challenge.\n\nIMPORTANT:\nDo not invent business problems just to create a sales opportunity.\nIf there is insufficient evidence, explicitly state that the challenge is a hypothesis rather than a confirmed problem.\nIf no meaningful pain points can be identified, say so honestly.\n\n## 5. SALES OPPORTUNITY\n\nEvaluate the relationship between the identified business challenges and the product or service being offered.\n\nExplain:\n- Which pain point represents the strongest sales opportunity.\n- Why the supplied solution could be relevant.\n- What business outcome the solution could potentially support.\n- Which commercial angle should be prioritized.\n\nDo not promise results or invent measurable benefits.\n\n## 6. PERSONALIZED OUTREACH MESSAGES\n\nCreate three messages.\n\n### A. LinkedIn Connection Request\nMaximum 300 characters.\n\nRequirements:\n- Natural and professional.\n- Specific to the contact or company.\n- No generic sales language.\n- No immediate aggressive sales pitch.\n\n### B. Initial LinkedIn Message\nMaximum 120 words.\n\nRequirements:\n- Start with a genuinely relevant observation.\n- Reference a specific company development, business activity or supported business challenge.\n- Connect that observation to the user's product or service.\n- Explain the potential value clearly.\n- End with the user's exact Call to Action.\n- Follow the requested outreach tone.\n\nThe message must sound like it was written specifically for this person and company.\n\n### C. Follow-Up Message\nMaximum 80 words.\n\nRequirements:\n- Natural and conversational.\n- Refer to the original business observation.\n- Introduce the value proposition briefly.\n- Avoid pressure or aggressive sales tactics.\n- Include a suitable next step.\n\n## 7. STRATEGIC RECOMMENDATION\n\nProvide:\n- The strongest identified pain point.\n- The recommended message to send first.\n- Why this approach is likely to be relevant.\n- The best communication angle.\n- Any information that should be verified before contacting the lead.\n\n## 8. RESEARCH SOURCES\n\nList the available research sources and their URLs whenever provided.\n\nDo not invent sources or links.\n\n## 9. STRICT ACCURACY RULES\n\n1. Never invent company facts, statistics, achievements, customers, partnerships or developments.\n2. Never pretend to have accessed private LinkedIn information.\n3. Never claim to have personally inspected a LinkedIn profile if only its URL was supplied.\n4. Never present assumptions as confirmed facts.\n5. Distinguish public evidence from commercial hypotheses.\n6. Never invent operational problems or financial difficulties.\n7. Never invent customer results, testimonials or performance guarantees.\n8. Never use generic personalization such as simply mentioning the company name.\n9. Never create false urgency.\n10. If the research is insufficient, clearly explain the limitations and produce a cautious recommendation.\n11. Use the exact product, service and value proposition supplied by the user. Do not create a different offer.\n12. Respect the requested tone and Call to Action.\n\n## 10. OUTPUT FORMAT\n\nWrite the final report using the following structure:\n\n# LEAD DETECTIVE — BUSINESS INTELLIGENCE REPORT\n\n## 1. Company Intelligence\n\n## 2. Identified Business Pain Points\n\n## 3. Sales Opportunity\n\n## 4. Personalized Outreach Messages\n\n### LinkedIn Connection Request\n\n### Initial LinkedIn Message\n\n### Follow-Up Message\n\n## 5. Strategic Recommendation\n\n## 6. Research Sources\n\n## 7. Research Confidence & Limitations\n\nUse professional formatting, clear explanations and actionable recommendations.\n\nThe final result must prioritize accuracy, specificity and commercial relevance over quantity.\n\nWrite in the language most appropriate for the business context.\n## CRITICAL OUTREACH PERSONALIZATION RULES\n\n1. NEVER leave placeholders in the final messages.\n2. NEVER write [Name], [Product/Service], [Value Proposition], [Insert CTA] or similar placeholders.\n3. Always use the exact product/service, value proposition and CTA supplied in the input.\n4. Always use the supplied contact name. If the name is unavailable or is a generic role, do not invent a person's name. Address the recipient naturally without a placeholder.\n5. Every outreach message must explain a concrete connection between an identified company observation and the actual product/service being offered.\n6. Do not force a connection between unrelated business challenges and the product.\n7. If no strong commercial connection exists, explicitly say so and recommend a more suitable approach.\n8. For AI receptionist solutions, consider patient enquiries, missed calls, appointment requests, response times and administrative workload ONLY when supported by evidence or clearly labelled as potential opportunities.\n9. The final CTA must reproduce the user's supplied Call to Action exactly.\n10. Before submitting the report, perform a final check to ensure every message is complete, personalized and ready to copy and send.",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        560,
+        0
+      ],
+      "id": "b7b0f137-25bf-4632-bcd7-1bda35fc1119",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        208
+      ],
+      "id": "e51a6887-8fc1-4de6-98cf-e11dad632871",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Lead Detective — Research Complete",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        816.3366984343555,
+        0
+      ],
+      "id": "162d61bc-09c4-4241-8c11-d7bb0bdbaea9",
+      "name": "Form",
+      "webhookId": "5b8874a2-02fb-410c-ac7d-87b59949ae7c"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a667560a-b160-4d6f-bdb8-450e2f69a9bb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "knUiTKTXh6UiXe9q",
+  "tags": []
+}

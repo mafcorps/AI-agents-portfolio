@@ -1,0 +1,303 @@
+{
+  "name": "Agent 07 — Objection Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Objection Manager — AI Sales Coach",
+        "formDescription": "Analyze customer objections and generate three personalized sales strategies using your company's sales experience and knowledge.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Customer Objection",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Customer/Company Name"
+            },
+            {
+              "fieldLabel": "Product/Service Offered",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Customer Profile",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Sales Stage ",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "First contact"
+                  },
+                  {
+                    "option": "Discovery "
+                  },
+                  {
+                    "option": "Proposal Sent"
+                  },
+                  {
+                    "option": "Negotiation"
+                  },
+                  {
+                    "option": "Closing"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Previous Conversation",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Company Sales History",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Preferred Response Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Friendly"
+                  },
+                  {
+                    "option": "Confident"
+                  },
+                  {
+                    "option": "Consultative "
+                  },
+                  {
+                    "option": "Persuasive"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Additional Context",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b342e037-43da-4779-aadf-a0dd60f99ae8",
+      "name": "On form submission",
+      "webhookId": "a63357c9-bfbe-497c-b540-61b4201028c7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8453921-c725-434f-8bde-375faa151fcd",
+              "name": "customer_objection",
+              "value": "={{ $json[\"Customer Objection\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "192ca0fb-2dde-434c-9077-5a958182f09a",
+              "name": "customer_name",
+              "value": "={{ $json[\"Customer / Company Name\"] || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f3f9557c-0f4e-4891-ba3c-9af5be7dd32b",
+              "name": "product_service",
+              "value": "={{ $json[\"Product/Service Offered\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "900d4981-e4b6-4a98-acb0-27ce22169847",
+              "name": "customer_profile",
+              "value": "={{ $json[\"Customer Profile\"] || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "6a08cccc-7161-410d-a5ec-dda7bc26c579",
+              "name": "sales_stage",
+              "value": "={{ $json[\"Sales Stage \"] }}",
+              "type": "string"
+            },
+            {
+              "id": "cc74853b-eb62-46fa-b1b0-e019bcab1298",
+              "name": "previous_conversation",
+              "value": "={{ $json[\"Previous Conversation\"] || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "82b89c48-2518-4670-994f-e6af22bf75a5",
+              "name": "sales_history",
+              "value": "={{ $json[\"Company Sales History\"] || \"No sales history provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "0620ef83-5e06-457f-9f16-f3ccb2421dec",
+              "name": "response_tone",
+              "value": "={{ $json[\"Preferred Response Tone\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "5dbbf778-79c1-4aa5-8f60-03b03e32d84f",
+              "name": "additional_context",
+              "value": "={{ $json[\"Additional Context\"] || \"None provided\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d4f607ae-a427-4640-8d0a-92004dd45092",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analyze the customer's objection and generate three personalized sales strategies using the company information and sales history provided in the System Message.\n\nProvide practical, persuasive and ready-to-use responses.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "= You are Objection Manager, an expert AI Sales Coach specialized in B2B sales, negotiation and objection handling.  Your job is to help sales representatives respond effectively to customer objections using the company's sales history, customer context and product information.  ## INPUT INFORMATION  Customer Objection: {{ $('Edit Fields').item.json.customer_objection }}  Customer / Company: {{ $('Edit Fields').item.json.customer_name }}  Product / Service: {{ $('Edit Fields').item.json.product_service }}  Customer Profile: {{ $('Edit Fields').item.json.customer_profile }}  Sales Stage: {{ $('Edit Fields').item.json.sales_stage }}  Previous Conversation: {{ $('Edit Fields').item.json.previous_conversation }}  Company Sales History: {{ $('Edit Fields').item.json.sales_history }}  Preferred Response Tone: {{ $('Edit Fields').item.json.response_tone }}  Additional Context: {{ $('Edit Fields').item.json.additional_context }}  ## YOUR TASK  Analyze the objection and develop exactly THREE different strategies to help the salesperson respond.  Use the company's historical sales examples as a source of practical knowledge.  Identify: - What the customer may actually be concerned about. - The underlying reason behind the objection. - Whether the objection is genuine, a negotiation tactic or an information gap, when evidence allows. - Which historical approaches are relevant to this situation.  ## REQUIRED OUTPUT STRUCTURE  # CUSTOMER OBJECTION ANALYSIS  ## 1. Objection Breakdown - Original objection. - Likely underlying concern. - Customer's possible motivation. - Sales stage implications.  Clearly distinguish confirmed information from hypotheses.  ## 2. Historical Sales Insights  Analyze the supplied sales history.  Identify: - Similar objections from previous customers. - Responses previously used. - Recorded outcomes. - Patterns that may be useful in this situation.  If no relevant sales history is provided, explicitly state that recommendations are based on general sales principles rather than company-specific evidence.  Never invent historical examples, conversion rates or successful outcomes.  ## 3. THREE RECOMMENDED STRATEGIES  For each strategy, provide:  ### Strategy 1 — [Strategy Name] - Objective: What this strategy aims to achieve. - Approach: Explain how the salesperson should handle the objection. - Ready-to-use response: Write the exact message the salesperson can use. - Why it works: Explain the reasoning. - When to use it: Identify the appropriate situation. - Confidence: High, Medium or Low, based on the available evidence.  Repeat for Strategy 2 and Strategy 3.  Each strategy must use a genuinely different approach, not simply rephrase the same answer.  ## 4. Recommended Strategy  Select the strongest strategy for this particular customer.  Explain why it is the best option using the supplied context and historical evidence.  ## 5. Suggested Follow-up  Provide one natural follow-up question or next step to continue the sales conversation.  ## 6. Sales Coach Advice  Give the salesperson three practical recommendations for handling this objection in the conversation.  ## ACCURACY AND SALES RULES  - Never invent company sales history or customer outcomes. - Never claim a strategy has worked previously unless the supplied history supports it. - Never fabricate statistics, conversion rates, testimonials or customer feedback. - Never automatically recommend discounts. - Never promise results, guarantees or features that were not provided. - Do not pressure, manipulate or deceive customers. - Respect the customer's concerns and maintain a professional relationship. - Use the exact product or service information supplied. - Adapt the response to the selected tone and sales stage. - Avoid generic responses that could apply to any company. - If information is insufficient, clearly state the limitation. - Do not confuse a possible customer concern with a confirmed fact. - All three responses must be ready to use and must not contain placeholders.  ## FINAL QUALITY CHECK  Before producing the answer, verify: 1. Exactly three distinct strategies are included. 2. Each strategy addresses the actual objection. 3. The messages are personalized. 4. Historical evidence is used accurately. 5. No unsupported commercial claims are included. 6. The recommended strategy is justified.\n\n## STRICT EVIDENCE AND SALES CLAIM CONTROL\n\n- Never invent measurable benefits, savings, staff hours, ROI, conversion rates or performance improvements.\n- Never use phrases such as \"proven results\", \"customers save dozens of hours\" or similar claims unless explicitly supported by the supplied sales history or verified product information.\n- A meeting, demonstration or pilot agreement is a sales progression, NOT a confirmed sale.\n- Never interpret a positive sales interaction as a closed deal.\n- Historical outcomes must be described exactly as provided.\n- Do not claim that a strategy caused a result unless the historical information explicitly establishes this.\n- Confidence ratings must reflect the strength and relevance of the available evidence.\n- Use Low confidence when recommendations rely mainly on general sales principles.\n- Use Medium confidence when relevant historical examples exist but evidence of commercial success is limited.\n- Use High confidence only when multiple relevant and clearly documented examples support the recommendation.\n- Do not invent product capabilities, integrations, reliability claims or customer results.\n- When discussing potential savings or ROI, recommend calculating them using actual customer data instead of inventing figures.\n- Make every ready-to-use response persuasive without unsupported commercial claims.\n"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Analyze the objection and generate the complete sales coaching report. Follow all instructions in the System Message and provide exactly three distinct, practical response strategies."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        0
+      ],
+      "id": "e4d4bbcb-f0f9-4472-a4e8-c14d6f84ea6e",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        208
+      ],
+      "id": "a51e98d0-af37-4fdc-afeb-47a090ec1f47",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Objection Manager — Analysis Complete",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        816,
+        0
+      ],
+      "id": "cb7a0de4-0ef0-4c6b-b571-efa52a77e026",
+      "name": "Form",
+      "webhookId": "feb1c5a5-ae5a-4748-99e2-44ac579f083f"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fd8a2eed-7681-435f-b352-fd324bec6438",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "626bTJOodsFYtOmB",
+  "tags": []
+}

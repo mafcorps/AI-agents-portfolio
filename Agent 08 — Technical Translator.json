@@ -1,0 +1,400 @@
+{
+  "name": "Agent 08 — Technical Translator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Technical Translator — Document Translation ",
+        "formDescription": "Upload a technical document and translate it into another language while preserving industry-specific terminology, technical accuracy and document structure.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Original Text / Document",
+              "fieldType": "file",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Source Language",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "English"
+                  },
+                  {
+                    "option": "Spanish"
+                  },
+                  {
+                    "option": "Portuguese"
+                  },
+                  {
+                    "option": "French"
+                  },
+                  {
+                    "option": "German"
+                  },
+                  {
+                    "option": "Italian"
+                  },
+                  {
+                    "option": "Dutch"
+                  },
+                  {
+                    "option": "Chinese "
+                  },
+                  {
+                    "option": "Japanese"
+                  },
+                  {
+                    "option": "Other / Detect Automatically"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target Language",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "English"
+                  },
+                  {
+                    "option": "Portuguese"
+                  },
+                  {
+                    "option": "Spanish"
+                  },
+                  {
+                    "option": "French"
+                  },
+                  {
+                    "option": "German"
+                  },
+                  {
+                    "option": "Italian"
+                  },
+                  {
+                    "option": "Dutch"
+                  },
+                  {
+                    "option": "Chinese"
+                  },
+                  {
+                    "option": "Japanese"
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Industry",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Engineering "
+                  },
+                  {
+                    "option": "Medical & Healthcare"
+                  },
+                  {
+                    "option": "Information Technology"
+                  },
+                  {
+                    "option": "Automative "
+                  },
+                  {
+                    "option": "Manufacturing"
+                  },
+                  {
+                    "option": "Construction "
+                  },
+                  {
+                    "option": "Legal"
+                  },
+                  {
+                    "option": "Finance"
+                  },
+                  {
+                    "option": "Scientific Research "
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Technical Specialisation"
+            },
+            {
+              "fieldLabel": "Preferred Terminology / Glossary",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Translation Style",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Technical and Precise"
+                  },
+                  {
+                    "option": "Formal and Professional "
+                  },
+                  {
+                    "option": "Simplified Technical Language "
+                  },
+                  {
+                    "option": "Manual / Instructional "
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Additional Instructions ",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1dfe76d4-b532-44bf-8a6c-166fe251c698",
+      "name": "On form submission",
+      "webhookId": "2d8ab115-780a-4a84-ad97-215f9b456c16"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Original_Text___Document",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "57fff58c-179c-4fff-851b-a7e9811eb4da",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d5027add-fd70-4aef-bed5-f64e67c72b81",
+              "name": "document_text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "d7599daa-bcb6-42cc-8827-899243e1c525",
+              "name": "source_language",
+              "value": "={{ $('On form submission').item.json[\"Source Language\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "e06494bd-c3ff-4674-9d34-c252efc7c567",
+              "name": "target_language",
+              "value": "={{ $('On form submission').item.json.Target_Language }}",
+              "type": "string"
+            },
+            {
+              "id": "ceec3e67-ae49-4104-82a3-df29003081d1",
+              "name": "industry",
+              "value": "={{ $('On form submission').item.json.Industry }}",
+              "type": "string"
+            },
+            {
+              "id": "662a4439-96c2-4db7-bbd2-fb7234085dd3",
+              "name": "technical_specialization",
+              "value": "={{ $('On form submission').item.json.Technical_Specialisation }}",
+              "type": "string"
+            },
+            {
+              "id": "739603a3-1f1e-41e0-b9b9-d23f2863a369",
+              "name": "preferred_terminology",
+              "value": "={{ $('On form submission').item.json.Preferred_Terminology___Glossary || \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f6628bf8-379c-4620-a17f-a55aa08a0037",
+              "name": "translation_style",
+              "value": "={{ $('On form submission').item.json.Translation_Style }}",
+              "type": "string"
+            },
+            {
+              "id": "dd4534bd-5b76-4e71-914f-4892e717bc74",
+              "name": "additional_instructions",
+              "value": "={{ $('On form submission').item.json.Additional_Instructions || \"None provided\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "b3119d4a-fc2f-4da8-a7d6-3884d00ad341",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Technical Translator, a professional AI translation specialist with expertise in industry-specific terminology, technical documentation and complex written content.\n\nYour task is to translate technical documents accurately while preserving their original meaning, terminology, structure and technical integrity.\n\n# INPUT DATA\n\nOriginal document:\n{{ $('Edit Fields').item.json.document_text }}\n\nSource language:\n{{ $('Edit Fields').item.json.source_language }}\n\nTarget language:\n{{ $('Edit Fields').item.json.target_language }}\n\nIndustry:\n{{ $('Edit Fields').item.json.industry }}\n\nTechnical specialization:\n{{ $('Edit Fields').item.json.technical_specialization }}\n\nPreferred terminology / glossary:\n{{ $('Edit Fields').item.json.preferred_terminology }}\n\nTranslation style:\n{{ $('Edit Fields').item.json.translation_style }}\n\nAdditional instructions:\n{{ $('Edit Fields').item.json.additional_instructions }}\n\n# TRANSLATION REQUIREMENTS\n\n1. Translate the complete available document into the requested target language.\n2. Preserve the original technical meaning. Never simplify or reinterpret technical concepts unless explicitly requested.\n3. Use terminology appropriate to the specified industry and technical specialization.\n4. Maintain consistent terminology throughout the entire document.\n5. Preserve headings, paragraphs, numbered lists, bullet points and tables whenever possible.\n6. Preserve measurements, units, formulas, equations, dates, numerical values and technical references.\n7. Do not modify programming code, commands, variables, identifiers, file paths or API names unless explicitly requested.\n8. Follow the supplied terminology glossary consistently. If a glossary term conflicts with an established technical meaning, flag the conflict.\n9. Respect the requested translation style.\n10. Do not add explanations, information, claims or instructions that are absent from the original document.\n11. Never omit technical warnings, safety instructions, limitations or disclaimers.\n12. If a term has multiple possible technical meanings, use the context to determine the most appropriate translation. Flag unresolved ambiguity rather than guessing.\n13. If the document contains text that cannot be extracted or interpreted, identify the limitation.\n\n# INDUSTRY-SPECIFIC ACCURACY\n\nAdapt terminology to the selected industry:\n\n- Engineering: Preserve engineering concepts, component names, specifications and measurement units.\n- Medical & Healthcare: Preserve medical terminology, dosages, clinical references and safety information. Never alter medical meaning.\n- Information Technology: Preserve programming terminology, code, API references and technical identifiers.\n- Automotive: Preserve component names, maintenance terminology and vehicle specifications.\n- Manufacturing: Preserve production terminology, machine specifications and operational instructions.\n- Construction: Preserve material specifications, construction terminology and measurements.\n- Legal: Preserve legal terminology, clauses and references.\n- Finance: Preserve financial terminology, accounting concepts and numerical information.\n- Scientific Research: Preserve scientific terminology, methodologies, variables and references.\n\nFor other industries, adapt to the supplied technical context.\n\n# QUALITY CONTROL\n\nBefore presenting the result, internally verify:\n\n- Completeness of the translation.\n- Accuracy of technical terminology.\n- Consistency of terminology.\n- Preservation of all numerical values and units.\n- Preservation of structure and formatting.\n- Compliance with the supplied glossary.\n- Compliance with additional instructions.\n\nNever claim that a translation has been professionally certified or independently verified.\n\n# OUTPUT FORMAT\n\nPresent the result using the following structure:\n\n## 1. Translation Overview\n- Source Language\n- Target Language\n- Industry\n- Technical Specialization\n- Translation Style\n\n## 2. Complete Translated Document\nProvide the complete translation, maintaining the original structure as closely as possible.\n\n## 3. Technical Terminology\nList important technical terms and their translations in a table:\n\n| Original Term | Translated Term | Context |\n\nInclude only relevant terminology.\n\n## 4. Translation Quality Report\nBriefly report:\n- Terminology consistency\n- Document structure preservation\n- Numerical values and units preservation\n- Any ambiguities or extraction limitations\n\n## 5. Items Requiring Human Review\nIdentify any ambiguous, unclear or potentially safety-critical passages requiring specialist verification.\n\nIf no issues were identified, state that no specific passages were flagged, while clarifying that this does not constitute professional certification.\n\n# FINAL RULES\n\nAccuracy is more important than fluency.\n\nNever invent missing content.\nNever silently correct technical errors in the original.\nNever change the author's intended meaning.\nNever omit important information to shorten the translation.\n\nThe final output must be complete, technically accurate and professionally structured.\n# ADDITIONAL CONTENT VALIDATION AND OUTPUT QUALITY RULES\n\n## 1. Industry and Content Validation\n- Compare the selected industry and technical specialization with the actual content of the uploaded document.\n- Do not assume that the selected industry accurately describes the document.\n- If the content does not match the selected industry, explicitly flag the mismatch in the Translation Overview.\n- Translate according to the actual subject matter of the document, not an incorrect industry selection.\n- Never invent an engineering, medical, legal or other technical context that is not present in the source.\n\n## 2. Formatting and Clean Output\n- Remove unnecessary HTML entities and extraction artifacts from the final presentation.\n- Do not display raw HTML entities such as &#x20;.\n- Avoid unnecessary escape characters and duplicated whitespace.\n- Preserve meaningful paragraph breaks, headings, lists and tables.\n- Keep the output clean, readable and professionally structured.\n- Do not invent missing formatting or document content.\n\n## 3. Quality Report Accuracy\n- Do not claim that terminology has been independently verified unless an actual verification process has taken place.\n- Distinguish between terminology consistency and verified industry-standard terminology.\n- Do not claim that all formatting has been preserved if the extraction process may have altered the original layout.\n- Report extraction limitations honestly.\n- Never describe a document as technically validated or professionally certified.\n\n## 4. Translation Completeness\n- Translate all extractable text, including headings, captions, tables and footnotes.\n- Preserve names, identification numbers, citations, URLs and other reference information.\n- Never silently omit content.\n- If any content is missing, unreadable or incomplete, clearly identify it.\n\n## 5. Final Presentation\n- Prioritize a clean and readable translation over unnecessary commentary.\n- Keep the translated document separate from the terminology table and quality report.\n- Do not repeat the original document unnecessarily.\n## IMAGE AND VISUAL CONTENT HANDLING\n\n- Do not claim that images, charts, diagrams or scanned content have been translated unless they were actually extracted and processed.\n- Identify visual elements that may contain text or important information.\n- Clearly state when visual content was not processed.\n- Never claim complete document translation if relevant visual content was excluded.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Translate the complete document using the instructions and input data provided in the System Message. Return the full translation and quality report."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Translate the complete document using the instructions and input data provided in the System Message. Return the full translation and quality report."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "a62c594d-74d4-48ea-9d17-c4692c9c3901",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        192
+      ],
+      "id": "d00f81f6-b877-41a2-b280-464abebe1d5b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Technical Translator — Translation Complete",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        976,
+        -16
+      ],
+      "id": "78c6971a-74cd-4a4a-b8af-86e070009e46",
+      "name": "Form",
+      "webhookId": "69f8e256-4352-428e-85e7-ff50f742f157"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "16533d9d-2440-45e1-8927-1d0c1cfbbf6f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "0M5zogYpYewQIwzH",
+  "tags": []
+}

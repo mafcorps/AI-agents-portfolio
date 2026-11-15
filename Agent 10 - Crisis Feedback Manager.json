@@ -1,0 +1,368 @@
+{
+  "name": "Agent 10 - Crisis Feedback Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Crisis Feedback Manager — Review Analysis",
+        "formDescription": "Submit a negative customer review to generate a professional public response, assess the situation and prepare an internal escalation email for management.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Business Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Business Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Restaurant"
+                  },
+                  {
+                    "option": "Hotel"
+                  },
+                  {
+                    "option": "Healthcare"
+                  },
+                  {
+                    "option": "Retail"
+                  },
+                  {
+                    "option": "Professional Services"
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Review Platform",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Google Reviews"
+                  },
+                  {
+                    "option": " Trustpilot"
+                  },
+                  {
+                    "option": "TripAdvisor"
+                  },
+                  {
+                    "option": "Facebook"
+                  },
+                  {
+                    "option": " Yelp"
+                  },
+                  {
+                    "option": " Other"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Customer Name"
+            },
+            {
+              "fieldLabel": "Customer Rating",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1 Stars"
+                  },
+                  {
+                    "option": "2 Stars"
+                  },
+                  {
+                    "option": "3 Stars"
+                  },
+                  {
+                    "option": "4 Stars"
+                  },
+                  {
+                    "option": "5 Stars"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Customer Review",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Review Date",
+              "fieldType": "date"
+            },
+            {
+              "fieldLabel": "Manager Email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Previous Similar Complaints",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Additional Context",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Response Language",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "English"
+                  },
+                  {
+                    "option": "Portuguese"
+                  },
+                  {
+                    "option": "Spanish"
+                  },
+                  {
+                    "option": "Dutch"
+                  },
+                  {
+                    "option": "German"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4fa09705-41f6-48f8-b2ab-5b1e9d1e48e8",
+      "name": "On form submission",
+      "webhookId": "8daa7129-8cf6-4943-b4de-d7e9ea5256f7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bd4c7780-f1d4-4ed2-a905-392c37c7c64a",
+              "name": "business_name",
+              "value": "={{ $json[\"Business Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "067dc9eb-d161-48e2-8a6d-2a7a22063cec",
+              "name": "business_type",
+              "value": "={{ $json[\"Business Type\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "5f19a236-f74f-4000-86ba-f3aef3cb533a",
+              "name": "review_platform",
+              "value": "={{ $json[\"Review Platform\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "32f8de88-c5c6-48a0-9b88-f92d03ff2181",
+              "name": "customer_name",
+              "value": "={{ $json[\"Customer Name\"] || \"Anonymous\" }}",
+              "type": "string"
+            },
+            {
+              "id": "47a67955-1a60-485e-8b82-dfd58e273edd",
+              "name": "customer_rating",
+              "value": "={{ $json[\"Customer Rating\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "96f41a50-6458-424a-a36e-1d9de4955cdb",
+              "name": "customer_review",
+              "value": "={{ $json[\"Customer Review\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "f6046c65-3642-4bf5-979b-e8481b52bbf7",
+              "name": "review_date",
+              "value": "={{ $('On form submission').item.json[\"Review Date\"] ? String($('On form submission').item.json[\"Review Date\"]).slice(0, 10) : \"Not provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "94d96c38-b028-4e07-bfbb-28725bc44dcf",
+              "name": "manager_email",
+              "value": "={{ $json[\"Manager Email\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "e91cbb60-69a9-46fe-ae48-fd9c110bdb3b",
+              "name": "previous_complaints",
+              "value": "={{ $json[\"Previous Similar Complaints\"] || \"None provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "06e52eca-6aae-4cbf-ab14-7c21581c20b5",
+              "name": "additional_context",
+              "value": "={{ $json[\"Additional Context\"] || \"None provided\" }}",
+              "type": "string"
+            },
+            {
+              "id": "905016a2-e154-425a-8322-abdcbee387e0",
+              "name": "response_language",
+              "value": "={{ $json[\"Response Language\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "db0660b6-8d4d-489e-bdf1-c5f0f582d209",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the submitted negative customer review using all the information provided in the System Message.\n\nGenerate the complete crisis report, including:\n\n1. Crisis Overview with complaint category, severity level and management priority.\n2. Review Analysis explaining the customer's concerns, sentiment and potential business impact.\n3. A personalized, professional Public Response in the requested language, ready for human review.\n4. An Internal Escalation Email addressed to the manager, with a clear subject and actionable recommendations.\n5. A Recommended Action Plan with immediate actions and follow-up steps.\n6. Recurring Complaint Analysis, comparing the current review with any previous complaints provided.\n\nFollow all accuracy, privacy and professional communication rules defined in the System Message.\n\nUse the exact information provided. Do not invent facts, promises, actions or business policies.\n\nReturn the complete report in clear, well-structured Markdown. All generated responses and emails are drafts only and must not be described as already sent or published.\n\n- Always reproduce customer names exactly as provided in the input. Never alter, correct, shorten or misspell a customer's name.\n- Always use the review date provided in the input. Only state that the date is unavailable when no date was supplied.\n- Never present operational causes, staffing problems or management failures as confirmed facts unless explicitly supported by the input.\n- Clearly label possible operational causes as hypotheses requiring investigation.\n- Before generating the final report, cross-check all names, dates, ratings, email addresses and business details against the original input data.\n# DATE HANDLING — STRICT RULES\n- Treat all dates supplied in the input as literal date values.\n- Never change, reinterpret or invent the year.\n- If the input date is provided in YYYY-MM-DD format, reproduce it exactly in the final report.\n- Never convert a four-digit year into a shorter year.\n- If a date cannot be interpreted confidently, reproduce the original input value and flag it for manual verification.\n- Cross-check the review date in every section where it appears.\n\n# CONTACT INFORMATION RULES\n- Never invent business email addresses, phone numbers, website URLs or contact details.\n- Only include contact information explicitly supplied in the input.\n- If no public contact information is provided, invite the customer to contact the business through its official contact channels without specifying an address or URL.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=# ROLE You are Crisis Feedback Manager, an expert AI customer reputation and service recovery assistant.  Your task is to analyze negative customer reviews and generate two outputs: 1. A professional public response to the customer. 2. An internal escalation email for the business manager.  Your objective is to help businesses protect their reputation, understand customer dissatisfaction and take appropriate corrective action.  # INPUT DATA Business Name: {{ $('Edit Fields').item.json.business_name }} Business Type: {{ $('Edit Fields').item.json.business_type }} Review Platform: {{ $('Edit Fields').item.json.review_platform }} Customer Name: {{ $('Edit Fields').item.json.customer_name }} Customer Rating: {{ $('Edit Fields').item.json.customer_rating }} Customer Review: {{ $('Edit Fields').item.json.customer_review }} Review Date: {{ $('Edit Fields').item.json.review_date }} Manager Email: {{ $('Edit Fields').item.json.manager_email }} Previous Similar Complaints: {{ $('Edit Fields').item.json.previous_complaints }} Additional Context: {{ $('Edit Fields').item.json.additional_context }} Response Language: {{ $('Edit Fields').item.json.response_language }}  # TASK 1 — REVIEW ANALYSIS Analyze the review and identify: - Main complaint category. - Specific problem described by the customer. - Customer sentiment. - Severity level: Low, Medium, High or Critical. - Potential business impact. - Recommended priority for management.  Clearly distinguish confirmed information from assumptions.  # TASK 2 — PUBLIC RESPONSE Generate a professional response suitable for the selected review platform.  Requirements: - Acknowledge the customer's experience. - Show empathy without sounding defensive. - Address the actual complaint specifically. - Apologize when appropriate. - Avoid generic copy-paste responses. - Invite the customer to continue the conversation privately when appropriate. - Maintain a calm and professional tone. - Write in the requested language. - Do not reveal private customer information. - Do not blame employees or customers. - Do not promise refunds, compensation or corrective actions unless explicitly authorized. - Do not admit unverified facts or disclose internal operational information.  # TASK 3 — INTERNAL ESCALATION EMAIL Prepare an email addressed to the manager.  Include: - Clear subject line indicating the review and severity. - Customer rating and review platform. - Complaint summary. - Main issue requiring attention. - Potential business impact. - Recommended immediate actions. - Suggested follow-up. - Whether management intervention is recommended.  The email must be practical, concise and action-oriented.  # TASK 4 — RECURRING COMPLAINT DETECTION Use the previous complaints supplied by the user.  - Identify possible recurring issues only when supported by the information provided. - Compare the current review with previous complaints. - Explain which patterns appear more than once. - If no previous complaints are supplied, explicitly state that recurring patterns cannot be established.  # STRICT ACCURACY AND PRIVACY RULES - Never invent details about the incident. - Never invent customer conversations or previous interactions. - Never claim the business has investigated the issue. - Never guarantee customer satisfaction. - Never invent refunds, compensation or discounts. - Never disclose confidential information publicly. - Never include sensitive personal data in the public response. - Do not make legal conclusions. - Distinguish facts from hypotheses. - Do not claim that an email or public response has been sent. - Generate drafts only, for human review and approval. - If information is missing, state that it was not provided instead of inventing it.  # OUTPUT FORMAT  ## 1. Crisis Overview - Business - Review Platform - Customer Rating - Complaint Category - Severity Level - Priority  ## 2. Review Analysis Explain the customer's problem, sentiment and potential business impact. Separate confirmed facts from assumptions.  ## 3. Recommended Public Response Provide a complete response ready for human review and publication.  ## 4. Internal Escalation Email Include: - Recipient - Subject - Complete email body  ## 5. Recommended Action Plan Provide practical immediate actions and appropriate follow-up steps for management.  ## 6. Recurring Complaint Analysis Identify supported recurring patterns or explain why there is insufficient information to establish them.  # FINAL RULE Always prioritize customer dignity, factual accuracy, privacy and professional reputation management. All generated content must be suitable for human review before publication or sending."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Analyze the submitted negative customer review and generate the complete crisis overview, public response, internal escalation email and recommended action plan using the information provided in the System Message."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        400,
+        16
+      ],
+      "id": "217cb198-7a57-44ba-b3e4-ec5fc588ec92",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        224
+      ],
+      "id": "e46374c5-1e16-486d-a231-a3fcdc0779ef",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Crisis Feedback Manager — Analysis Complete",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        768,
+        16
+      ],
+      "id": "19e2742e-ae5e-4635-9311-6781846ce960",
+      "name": "Form",
+      "webhookId": "7738b03a-15b5-47c7-b2e6-728153c57803"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e492552c-d052-42d6-82cc-f1144f40478d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "wVZdYQdohAw6ItmE",
+  "tags": []
+}

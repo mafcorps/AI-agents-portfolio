@@ -1,0 +1,365 @@
+{
+  "name": "Agent 09 - The Polite Debt Collector",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "The Polite Debt Collector — Invoice Follow-up",
+        "formDescription": "Upload your invoice records to identify overdue payments, calculate outstanding balances and generate professional payment reminder emails.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Invoice File",
+              "fieldType": "file",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company Email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Currency",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "EUR"
+                  },
+                  {
+                    "option": "USD"
+                  },
+                  {
+                    "option": "GBP"
+                  },
+                  {
+                    "option": "AED"
+                  },
+                  {
+                    "option": "other"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Default Payment Terms",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Reminder Language",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "English"
+                  },
+                  {
+                    "option": "Portuguese"
+                  },
+                  {
+                    "option": "Spanish"
+                  },
+                  {
+                    "option": "German"
+                  },
+                  {
+                    "option": "French"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Additional Instructions",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        16,
+        0
+      ],
+      "id": "5b5a676d-4c7f-4e42-8ab9-4a98d02f4001",
+      "name": "On form submission",
+      "webhookId": "4b4bd420-91bd-42a8-a523-02f0bb1a50bd"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "Invoice_File",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "e151df64-fa9d-495e-9012-c0e58396a357",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad26029b-2201-4948-b7ec-ffc06118b68f",
+              "name": "company_name",
+              "value": "={{ $('On form submission').item.json['Company Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "98f23f18-f425-4e8e-9139-f4381654c768",
+              "name": "company_email",
+              "value": "={{ $('On form submission').item.json['Company Email'] }}",
+              "type": "string"
+            },
+            {
+              "id": "e3bd76c6-43fd-4400-90cb-51da57349bdc",
+              "name": "currency",
+              "value": "={{ $('On form submission').item.json.Currency }}",
+              "type": "string"
+            },
+            {
+              "id": "2f4d8b96-9f3d-46ee-9ad9-d4c725a1be13",
+              "name": "reminder_language",
+              "value": "={{ $('On form submission').item.json['Reminder Language'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d11c19ee-e52e-4b42-950e-8bd70778cd8e",
+              "name": "payment_terms",
+              "value": "={{ $('On form submission').item.json['Default Payment Terms'] || 'Not specified' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        320,
+        0
+      ],
+      "id": "e84fda1b-a774-4326-a2cd-fade1797da47",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\nconst formData = $('On form submission').first().json;\n\nconst today = new Date();\ntoday.setUTCHours(0, 0, 0, 0);\n\nfunction parseDate(value) {\n  if (!value) return null;\n\n  const str = String(value).trim();\n  let date;\n\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(str)) {\n    date = new Date(`${str}T00:00:00Z`);\n  } else if (/^\\d{2}\\/\\d{2}\\/\\d{4}$/.test(str)) {\n    const [day, month, year] = str.split('/');\n    date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));\n  } else {\n    return null;\n  }\n\n  if (Number.isNaN(date.getTime())) return null;\n\n  // Reject impossible dates\n  const parts = str.includes('-')\n    ? str.split('-').map(Number)\n    : str.split('/').reverse().map(Number);\n\n  const [year, month, day] = parts;\n\n  if (\n    date.getUTCFullYear() !== year ||\n    date.getUTCMonth() + 1 !== month ||\n    date.getUTCDate() !== day\n  ) {\n    return null;\n  }\n\n  return date;\n}\n\nreturn items.map(item => {\n  const invoice = item.json;\n\n  const status = String(invoice.payment_status || '')\n    .trim()\n    .toLowerCase();\n\n  const dueDate = parseDate(invoice.due_date);\n\n  let daysOverdue = 0;\n  let urgencyLevel = 'Not overdue';\n  let eligible = false;\n  let reason = '';\n\n  const paidStatuses = ['paid', 'settled', 'complete', 'completed'];\n  const cancelledStatuses = ['cancelled', 'canceled', 'void', 'refunded'];\n  const unpaidStatuses = [\n    'unpaid',\n    'overdue',\n    'outstanding',\n    'pending',\n    'open',\n    'partially paid'\n  ];\n\n  if (paidStatuses.includes(status)) {\n    reason = 'Invoice already paid — no reminder required.';\n  } else if (cancelledStatuses.includes(status)) {\n    reason = 'Invoice cancelled or refunded — no reminder required.';\n  } else if (!dueDate) {\n    reason = 'Missing or invalid due date — manual review required.';\n  } else if (!unpaidStatuses.includes(status)) {\n    reason = 'Unrecognized invoice status — manual review required.';\n  } else if (dueDate >= today) {\n    reason = 'Invoice is not overdue yet.';\n  } else {\n    daysOverdue = Math.floor(\n      (today.getTime() - dueDate.getTime()) / 86400000\n    );\n\n    eligible = true;\n\n    if (daysOverdue <= 7) {\n      urgencyLevel = 'Level 1 — Friendly Reminder';\n    } else if (daysOverdue <= 15) {\n      urgencyLevel = 'Level 2 — Professional Follow-up';\n    } else if (daysOverdue <= 30) {\n      urgencyLevel = 'Level 3 — Firm Reminder';\n    } else {\n      urgencyLevel = 'Level 4 — Urgent Payment Notice';\n    }\n\n    reason = 'Unpaid invoice past its due date.';\n  }\n\n  return {\n    json: {\n      ...invoice,\n      company_name: formData['Company Name'],\n      company_email: formData['Company Email'],\n      currency: invoice.currency || formData.Currency,\n      reminder_language: formData['Reminder Language'],\n      payment_terms: formData['Default Payment Terms'] || 'Not specified',\n      days_overdue: daysOverdue,\n      urgency_level: urgencyLevel,\n      eligible_for_reminder: eligible,\n      processing_reason: reason\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "35d64ef3-5335-4a61-bb86-c69534c4a044",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "fad7563d-5a8f-4ab1-8dde-01162528b261",
+              "leftValue": "={{ $json.eligible_for_reminder }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        592,
+        0
+      ],
+      "id": "7d985038-3412-4075-bbc1-f55677a14dfe",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nYou are The Polite Debt Collector, a professional accounts receivable and payment reminder assistant.\n\nYour task is to generate clear, personalized and professional payment reminder emails for overdue invoices.\n\n## INVOICE INFORMATION\n\nInvoice Number: {{ $json.invoice_number }}\nCustomer Name: {{ $json.customer_name }}\nCustomer Email: {{ $json.customer_email }}\nAmount: {{ $json.amount }}\nCurrency: {{ $json.currency }}\nInvoice Date: {{ $json.invoice_date }}\nDue Date: {{ $json.due_date }}\nPayment Status: {{ $json.payment_status }}\nDays Overdue: {{ $json.days_overdue }}\nUrgency Level: {{ $json.urgency_level }}\n\nCompany: {{ $json.company_name }}\nCompany Email: {{ $json.company_email }}\nLanguage: {{ $json.reminder_language }}\nPayment Terms: {{ $json.payment_terms }}\n\nProcessing Reason: {{ $json.processing_reason }}\n\n## EMAIL GENERATION RULES\n\nGenerate one complete email for each invoice eligible for a payment reminder.\n\nAdapt the tone to the urgency level:\n\nLevel 1 — Friendly Reminder:\nPolite, friendly and helpful. Assume the customer may simply have forgotten.\n\nLevel 2 — Professional Follow-up:\nMore direct and professional. Clearly mention the overdue payment and request an update.\n\nLevel 3 — Firm Reminder:\nFirm, concise and explicit about the need to settle the outstanding invoice promptly.\n\nLevel 4 — Urgent Payment Notice:\nStrongly worded but respectful. Clearly communicate that immediate attention is required.\n\n## REQUIRED EMAIL STRUCTURE\n\n1. Subject line\n2. Professional greeting using the customer's actual name\n3. Reference to the invoice number\n4. Outstanding amount and currency\n5. Original due date\n6. Number of days overdue\n7. Clear request for payment\n8. Polite closing\n9. Company contact information\n\n## STRICT ACCURACY RULES\n\n- Use only the information provided.\n- Never invent payment methods, bank details, payment links or contractual terms.\n- Never invent late fees, interest, legal action or collection costs.\n- Never threaten or intimidate customers.\n- Never claim that previous reminders were sent unless explicitly stated.\n- Never imply that a payment has not been made if the invoice status is uncertain.\n- Do not offer discounts or payment plans unless explicitly authorized.\n- Do not change invoice amounts, dates or invoice numbers.\n- Never replace available invoice information with placeholders.\n- If a required field is missing, clearly identify it for human review.\n- Verify that the amount and currency match the supplied invoice.\n- Use the exact number of overdue days supplied.\n- Write in the selected language.\n- Maintain a professional and respectful tone, even at the highest urgency level.\n- Do not claim that an email has been sent. Only generate a draft.\n\n## ELIGIBILITY CONTROL\n\n- Only generate a payment reminder if eligible_for_reminder is true.\n- If the invoice is not eligible, do not generate a payment reminder email.\n- Instead, explain the processing reason using processing_reason.\n- Never generate reminders for paid, cancelled, refunded or not-yet-due invoices.\n\n## FINAL OUTPUT FORMAT\n\nFor eligible invoices:\n\n# Payment Reminder Email\n\n**To:** Customer Email\n**Subject:** [Professional subject line]\n\n[Complete email ready for human review]\n\n**Urgency Level:** [Actual urgency level]\n**Days Overdue:** [Actual number of days]\n\nFor invoices that are not eligible:\n\n# Invoice Not Eligible for Reminder\n\n**Invoice Number:** [Actual invoice number]\n**Customer:** [Actual customer name]\n**Reason:** [Processing reason]\n\nDo not generate an email for this invoice.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Generate the payment reminder email using the invoice information and rules provided in the system instructions.  Return the complete email with its subject line and body."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "=\nGenerate a payment reminder email using the actual invoice data below.\n\nINVOICE DATA:\nInvoice Number: {{ $json.invoice_number }}\nCustomer Name: {{ $json.customer_name }}\nCustomer Email: {{ $json.customer_email }}\nAmount: {{ $json.amount }}\nCurrency: {{ $json.currency }}\nInvoice Date: {{ $json.invoice_date }}\nDue Date: {{ $json.due_date }}\nPayment Status: {{ $json.payment_status }}\nDays Overdue: {{ $json.days_overdue }}\nUrgency Level: {{ $json.urgency_level }}\nCompany Name: {{ $json.company_name }}\nCompany Email: {{ $json.company_email }}\nPayment Terms: {{ $json.payment_terms }}\nReminder Language: {{ $json.reminder_language }}\n\nUse these exact values to generate the email.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        768,
+        -80
+      ],
+      "id": "15c33421-594c-4f30-b4fe-60dc0c5b200e",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        48
+      ],
+      "id": "118cc17c-11b5-4b91-b9a7-ae52379af866",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Payment Reminders — Generated",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        1072,
+        -80
+      ],
+      "id": "e032c52e-c901-4d99-bf64-d29a259ff9c4",
+      "name": "Form",
+      "webhookId": "556ff3e7-8270-4957-9a1d-cdedf4886501"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "eaf8c919-221f-4609-91dc-23de53769adf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52ef8d597d23d86f512598623f26a3b015b8f46332ef718b28025b2808ab4987"
+  },
+  "nodeGroups": [],
+  "id": "Cc9DjMy3VHOgK8tz",
+  "tags": []
+}
